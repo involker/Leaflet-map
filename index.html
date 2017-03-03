@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" /> -->
+	<link rel="stylesheet" href="leaflet.css" />
+	<!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script> -->
+	<script src="leaflet.js"></script>
+	<style type="text/css">
+		#map{
+			height: 800px;
+		}
+	</style>
+</head>
+<body>
+<div id="map"></div>
+</body>
+<script type="text/javascript">
+	var locationNode = '';
+	var zoomSize = 14;
+	var options = {
+		enableHighAcuracy:false,  //高精度模式
+		timeout:10,             //获取超时时间
+		maximumAge:1000		//重新获取时间间隔
+	}
+//获取本地经纬度
+	 function getLocation(){
+	        if (navigator.geolocation){
+	            navigator.geolocation.getCurrentPosition(showPosition,err);
+	        }else{
+	            alert("Geolocation is not supported by this browser.");
+	        }
+    }
+    getLocation();
+    function showPosition(position){
+    	locationNode=[position.coords.latitude,position.coords.longitude];
+    	var map = L.map('map').setView(locationNode, zoomSize);//设置中心点，缩放比例
+
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: false}).addTo(map);
+		//标注
+		L.marker(locationNode).addTo(map).bindPopup('A pretty CSS3 popup.<br> Easily customizable.');
+        // var x="Latitude: " + position.coords.latitude + "<br />Longitude: " + position.coords.longitude;
+        // console.log(x);
+	  		var line = [];
+
+        function drawLine(e) {
+	     	console.log(e);
+			// var circle = L.circle([e.latlng.lat,e.latlng.lng], 500, {
+	  //    		color: 'red',
+	  //       	fillColor: '#f03',
+	  //    		fillOpacity: 0.5
+	  //   	}).addTo(map);
+	  		// var s;
+	  		var polyline = L.polyline(line,{
+	  			color:'blue',
+	  			weight: 3,  
+        		clickable: false  
+
+	  		}).addTo(map);
+        //当点击地图的时候将当前点放入数组，然后设置线的经纬度，达到画线的目的  
+        line.push([e.latlng.lat, e.latlng.lng]);  
+        polyline.setLatLngs(line);  
+    	}
+    	map.on('click', drawLine);
+    }
+    function drawCircle(e){
+    	var circle = L.circle([e.latlng.lat,e.latlng.lng], 500, {
+	     		color: 'red',
+	        	fillColor: '#f03',
+	     		fillOpacity: 0.5
+	    	}).addTo(map);
+    }
+    function err(e){
+    	alert('getCurrentPosition error');
+    }
+</script>
+</html>
